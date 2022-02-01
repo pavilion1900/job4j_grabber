@@ -10,11 +10,8 @@ import java.io.IOException;
 public class SqlRuParse {
     public static void main(String[] args) throws IOException {
         for (int i = 1; i < 6; i++) {
-            String url = "https://www.sql.ru/forum/job-offers/1";
-            String[] array = url.split("/");
-            array[array.length - 1] = String.valueOf(i);
-            url = String.join("/", array);
-            Document doc = Jsoup.connect(url).get();
+            String url = "https://www.sql.ru/forum/job-offers/";
+            Document doc = Jsoup.connect(url + i).get();
             Elements row = doc.select(".postslisttopic");
             for (Element element : row) {
                 Element child = element.child(0);
