@@ -24,7 +24,8 @@ public class AlertRabbit {
                     .usingJobData(data)
                     .build();
             SimpleScheduleBuilder times = simpleSchedule()
-                    .withIntervalInSeconds(Integer.parseInt(properties.getProperty("rabbit.interval")))
+                    .withIntervalInSeconds(
+                            Integer.parseInt(properties.getProperty("rabbit.interval")))
                     .repeatForever();
             Trigger trigger = newTrigger()
                     .startNow()
@@ -42,9 +43,10 @@ public class AlertRabbit {
         @Override
         public void execute(JobExecutionContext context) {
             System.out.println("Rabbit runs here ...");
-            Connection connection = (Connection) context.getJobDetail().getJobDataMap().get("connection");
-            try (PreparedStatement statement =
-                         connection.prepareStatement("insert into rabbit (created_date) values (?);")) {
+            Connection connection =
+                    (Connection) context.getJobDetail().getJobDataMap().get("connection");
+            try (PreparedStatement statement = connection.prepareStatement(
+                    "insert into rabbit (created_date) values (?);")) {
                 statement.setTimestamp(1, new Timestamp(System.currentTimeMillis()));
                 statement.execute();
             } catch (SQLException e) {
@@ -55,7 +57,8 @@ public class AlertRabbit {
 
     public static Properties getProperties() {
         Properties properties = new Properties();
-        try (InputStream in = AlertRabbit.class.getClassLoader().getResourceAsStream("rabbit.properties")) {
+        try (InputStream in =
+                     AlertRabbit.class.getClassLoader().getResourceAsStream("rabbit.properties")) {
             properties.load(in);
         } catch (IOException e) {
             e.printStackTrace();
