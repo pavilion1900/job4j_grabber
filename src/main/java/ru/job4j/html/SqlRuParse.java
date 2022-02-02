@@ -11,9 +11,10 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 
 public class SqlRuParse {
-    public Post getPost(String link, String title) throws IOException {
+    public Post getPost(String link) throws IOException {
         DateTimeParser parser = new SqlRuDateTimeParser();
         Document page = Jsoup.connect(link).get();
+        String title = page.select(".messageHeader").get(0).text();
         String description = page.select(".msgBody").get(1).text();
         String dateTime = page.select(".msgFooter").text();
         dateTime = dateTime.substring(0, dateTime.indexOf(":") + 3);
@@ -23,15 +24,14 @@ public class SqlRuParse {
 
     public static void main(String[] args) throws IOException {
         SqlRuParse sqlRuParse = new SqlRuParse();
-        for (int i = 1; i < 6; i++) {
+        for (int i = 1; i < 2; i++) {
             String url = "https://www.sql.ru/forum/job-offers/";
             Document doc = Jsoup.connect(url + i).get();
             Elements row = doc.select(".postslisttopic");
             for (Element element : row) {
                 Element child = element.child(0);
                 String link = child.attr("href");
-                String title = child.text();
-                Post post = sqlRuParse.getPost(link, title);
+                Post post = sqlRuParse.getPost(link);
                 System.out.println(post);
             }
         }
