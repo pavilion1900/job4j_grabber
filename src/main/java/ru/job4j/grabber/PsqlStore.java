@@ -91,7 +91,7 @@ public class PsqlStore implements Store, AutoCloseable {
         }
     }
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         Properties properties = new Properties();
         try (InputStream in =
                      PsqlStore.class.getClassLoader().getResourceAsStream("rabbit.properties")) {
@@ -99,14 +99,16 @@ public class PsqlStore implements Store, AutoCloseable {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        Store store = new PsqlStore(properties);
-        Parse parse = new SqlRuParse(new SqlRuDateTimeParser());
-        List<Post> postsByLink = parse.list("https://www.sql.ru/forum/job-offers/");
-        postsByLink.forEach(store::save);
-        List<Post> postsFromDB = store.getAll();
-        postsFromDB.forEach(System.out::println);
-        Post postById = store.findById(5);
-        System.out.println(postById);
-        ((PsqlStore) store).close();
+        try (PsqlStore store = new PsqlStore(properties)) {
+            Parse parse = new SqlRuParse(new SqlRuDateTimeParser());
+            List<Post> postsByLink = parse.list("https://www.sql.ru/forum/job-offers/");
+            postsByLink.forEach(store::save);
+            List<Post> postsFromDB = store.getAll();
+            postsFromDB.forEach(System.out::println);
+            Post postById = store.findById(5);
+            System.out.println(postById);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
